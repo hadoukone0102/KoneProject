@@ -102,8 +102,28 @@ namespace KoneProject.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-    
 
+        // Gestion des utilisateurs
+
+        public async Task<ApiRessponse<List<UserModel>>> GetAllUsers()
+        {
+            var users = _context.Users.ToList();
+            if (users == null)
+            {
+                return await Task.FromResult(new ApiRessponse<List<UserModel>>(false, "Aucun utilisateur trouvé"));
+            }
+            return await Task.FromResult(new ApiRessponse<List<UserModel>>(true, "Liste des utilisateurs", users));
+        }
+
+        public async Task<ApiRessponse<string>> GetUserById(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return new ApiRessponse<string>(false, "Utilisateur introuvable");
+            }
+            return new ApiRessponse<string>(true, "Utilisateur trouvé", user);
+        }
 
     }
 }

@@ -8,6 +8,7 @@ namespace KoneProject.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionMiddleware> _logger;
+
         public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
@@ -20,11 +21,19 @@ namespace KoneProject.Middleware
             {
                 await _next(httpContext);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Accès non autorisé.");
+                httpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                httpContext.Response.ContentType = "application/json";
+                var response = new ApiRessponse<string>(false, "Non autorisé", null);
+                await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response));
+            }
             catch (Exception ex)
             {
-                httpContext.Response.ContentType = "application/json";
-                _logger.LogError(ex, "Une erreur interne s'est produite");
+                _logger.LogError(ex, "Une erreur interne s'est produite.");
                 httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                httpContext.Response.ContentType = "application/json";
                 var response = new ApiRessponse<string>(
                     false,
                     "Erreur interne du serveur. Veuillez contacter l'administrateur si le problème persiste.",
