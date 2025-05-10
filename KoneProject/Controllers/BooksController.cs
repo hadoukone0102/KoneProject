@@ -37,14 +37,27 @@ namespace KoneProject.Controllers
         public async Task<IActionResult> Create(CreateBooksDto book)
         {
             var newBooks = await _bookServices.CreateAsync(book);
-            return CreatedAtAction(nameof(GetById), new { id = newBooks.Id }, newBooks);
+            var response = new ApiRessponse<BooksDto>(
+                    true,
+                    "Livre créé avec succès",
+                    newBooks
+                );
+
+            return CreatedAtAction(nameof(GetById), new { id = newBooks.Id }, response);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult<ApiRessponse<string>>> Delete(int id)
         {
             var result = await _bookServices.DeleteAsync(id);
-            return result ? NoContent() : NotFound();
+
+            if (!result)
+            {
+                return NotFound(new ApiRessponse<string>(false, "Livre introuvable"));
+            }
+
+            return Ok(new ApiRessponse<string>(true, "Livre supprimé avec succès"));
         }
+
     }
 }
