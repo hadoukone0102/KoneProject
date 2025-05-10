@@ -1,5 +1,7 @@
 ﻿using KoneProject.DTOs;
+using KoneProject.Helpers;
 using KoneProject.Interfaces;
+using KoneProject.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,16 +20,17 @@ namespace KoneProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<ApiRessponse>> GetAll()
         {
-            return Ok(await _bookServices.GetAllAsync());
+            var books = await _bookServices.GetAllAsync();
+            return Ok(new ApiRessponse<IEnumerable<BooksDto>>(true, "Liste des livres recupérer avec succès", books));
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<ApiRessponse>> GetById(int id)
         {
             var book = await _bookServices.GetByIdAsync(id);
-            return book == null ? NotFound() : Ok(book);
+            return book == null ? NotFound() : Ok(new ApiRessponse<IEnumerator<BooksDto>>(true,"Livre recupérer avec succès",book));
         }
 
         [HttpPost]
