@@ -12,6 +12,7 @@ namespace KoneProject.Datas
         }
         // DbSet for UserModel
         public DbSet<UserModel> Users { get; set; }
+        public DbSet<BookModel> Books { get; set; }
 
     }
 }

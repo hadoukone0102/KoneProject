@@ -2,6 +2,7 @@ using KoneProject.Datas;
 using KoneProject.Interfaces;
 using KoneProject.Middleware;
 using KoneProject.Models;
+using KoneProject.Repository;
 using KoneProject.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -46,6 +47,10 @@ builder.Services.AddSwaggerGen();
 
 // Service personnalisé
 builder.Services.AddScoped<UserInterface, UserService>();
+builder.Services.AddScoped<IBookServices, BookServices>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Connexion BDD
 builder.Services.AddDbContext<AppDbContext>(options =>
