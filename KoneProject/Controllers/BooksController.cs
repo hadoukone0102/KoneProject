@@ -30,7 +30,7 @@ namespace KoneProject.Controllers
         public async Task<ActionResult<ApiRessponse>> GetById(int id)
         {
             var book = await _bookServices.GetByIdAsync(id);
-            return book == null ? NotFound() : Ok(new ApiRessponse<IEnumerator<BooksDto>>(true,"Livre recupérer avec succès",book));
+            return book == null ? NotFound() : Ok(new ApiRessponse<IEnumerator<BooksDto>>(true,"Livre à été recupérer avec succès",book));
         }
 
         [HttpPost]
