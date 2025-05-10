@@ -1,4 +1,5 @@
 ﻿using KoneProject.DTOs;
+using KoneProject.Helpers;
 using KoneProject.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,44 +20,44 @@ namespace KoneProject.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserDto userDto)
+        public async Task<ActionResult<ApiRessponse>> Register([FromBody] UserDto userDto)
         {
             // Appel de la méthode Register du UserService
             var result = await _userService.Register(userDto);
             if (result.Success)
             {
-                return Ok(result);
+                return Ok(new ApiRessponse<IEnumerable<UserDto>>(true,"Utilisateur créer avec succès",result));
             }
             return BadRequest(result);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] loginDto logDto)
+        public async Task<ActionResult<ApiRessponse>> Login([FromBody] loginDto logDto)
         {
             // Appel de la méthode Login du UserService
             var result = await _userService.Login(logDto);
             if (result.Success)
             {
-                return Ok(result);
+                return Ok(new ApiRessponse<IEnumerable<UserDto>>(true,"Utilisateur connecté avec succè",result));
             }
             return BadRequest(result);
         }
 
         [HttpGet("all")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetAllUsers()
+        //[Authorize(Roles = "admin")]
+        public async Task<ActionResult<ApiRessponse>> GetAllUsers()
         {
             var result = await _userService.GetAllUsers();
-            return result.Success ? Ok(result) : BadRequest(result);
+            return result.Success ? Ok(new ApiRessponse<IEnumerable<UserDto>>(true,"Liste des utilisateurs afficher",result)) : BadRequest(result);
         }
 
 
         [HttpGet("{id}")]
-        [Authorize]
-        public async Task<IActionResult> GetUserById(int id) // Change string to int
+        [Authorize(Roles ="admin")]
+        public async Task<ActionResult<ApiRessponse>> GetUserById(int id)
         {
             var result = await _userService.GetUserById(id);
-            return result.Success ? Ok(result) : NotFound(result);
+            return result.Success ? Ok(new ApiRessponse<IEnumerable<UserDto>>(true,"",result)) : NotFound(result);
         }
     }
 }
