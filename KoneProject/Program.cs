@@ -4,28 +4,31 @@ using KoneProject.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using KoneProject.Middleware;
+using KoneProject.Authorisations;
+
 
 var builder = WebApplication.CreateBuilder(args);
-
+var services = builder.Services;
 // 1. Controllers & API
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
+services.AddControllers();
+services.AddEndpointsApiExplorer();
+services.AddHttpContextAccessor();
 
 // 2. Custom services (via extension)
-builder.Services.AddApplicationServices();
+services.AddApplicationServices();
 
 // 3. Swagger configuration (via extension)
-builder.Services.AddSwaggerDocumentation();
+services.AddSwaggerDocumentation();
 
 // 4. JWT Authentication configuration (via extension)
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // 5. Database connection
-builder.Services.AddDbContext<AppDbContext>(options =>
+services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 6. IdentityCore configuration
-builder.Services.AddIdentityCore<UserModel>(options =>
+services.AddIdentityCore<UserModel>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 6;
@@ -36,8 +39,9 @@ builder.Services.AddIdentityCore<UserModel>(options =>
 .AddDefaultTokenProviders();
 
 // 7. Logging (optional)
-builder.Logging.AddConsole();
-builder.Logging.SetMinimumLevel(LogLevel.Debug);
+var logging = builder.Logging;
+logging.AddConsole();
+logging.SetMinimumLevel(LogLevel.Debug);
 
 // Build the app
 var app = builder.Build();
@@ -49,10 +53,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseMiddleware<ExceptionMiddleware>();
+//app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<JwtMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.MapControllers();
 
 app.Run();

@@ -15,6 +15,7 @@ namespace KoneProject.Extensions
             services.AddScoped<IBookServices, BookServices>();
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<UserInterface, UserService>();
+            services.AddSingleton<IJwtUtils, JwtUtils>();
 
             // AutoMapper
             services.AddAutoMapper(typeof(MappingBooks).Assembly);

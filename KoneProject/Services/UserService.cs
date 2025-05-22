@@ -72,7 +72,6 @@ namespace KoneProject.Services
             // Generate JWT token
             var token = GenerateJwtToken(existingUser);
             return new ApiRessponse<string>(true, "Connexion réussie", token);
-
         }
 
         private string GenerateJwtToken(UserModel user)

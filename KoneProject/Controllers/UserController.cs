@@ -1,8 +1,9 @@
 ﻿using KoneProject.DTOs;
 using KoneProject.Helpers;
 using KoneProject.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using KoneProject.Authorisations;
+
 
 namespace KoneProject.Controllers
 {
@@ -26,7 +27,7 @@ namespace KoneProject.Controllers
             var result = await _userService.Register(userDto);
             if (result.Success)
             {
-                return Ok(new ApiRessponse<IEnumerable<UserDto>>(true,"Utilisateur créer avec succès",result));
+                return Ok(result);
             }
             return BadRequest(result);
         }
@@ -44,16 +45,16 @@ namespace KoneProject.Controllers
         }
 
         [HttpGet("all")]
-        //[Authorize(Roles = "admin")]
-        public async Task<ActionResult<ApiRessponse>> GetAllUsers()
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAllUsers()
         {
             var result = await _userService.GetAllUsers();
-            return result.Success ? Ok(new ApiRessponse<IEnumerable<UserDto>>(true,"Liste des utilisateurs afficher",result)) : BadRequest(result);
+            return Ok(result);
         }
 
 
         [HttpGet("{id}")]
-        [Authorize(Roles ="admin")]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<ApiRessponse>> GetUserById(int id)
         {
             var result = await _userService.GetUserById(id);
